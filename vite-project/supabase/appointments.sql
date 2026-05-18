@@ -8,7 +8,7 @@ create table if not exists public.appointments (
   reason text not null,
   status text not null default 'booked',
   created_at timestamptz not null default now(),
-  constraint appointments_status_check check (status in ('booked', 'cancelled'))
+  constraint appointments_status_check check (status in ('booked', 'completed', 'cancelled'))
 );
 
 alter table public.appointments
@@ -39,7 +39,7 @@ begin
   ) then
     alter table public.appointments
       add constraint appointments_status_check
-      check (status in ('booked', 'cancelled'));
+      check (status in ('booked', 'completed', 'cancelled'));
   end if;
 end $$;
 

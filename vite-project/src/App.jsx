@@ -1,20 +1,13 @@
-import About from './components/About'
-import AppointmentScheduler from './components/AppointmentScheduler'
-import Footer from './components/Footer'
-import Hero from './components/Hero'
-import Navbar from './components/Navbar'
-import Services from './components/Services'
+import AdminPage from './pages/AdminPage'
+import HomePage from './pages/HomePage'
+import { Route, RouterProvider } from './lib/router'
 
 function App() {
   return (
-    <main className="min-h-screen bg-white font-sans text-slate-950">
-      <Navbar />
-      <Hero />
-      <About />
-      <Services />
-      <AppointmentScheduler />
-      <Footer />
-    </main>
+    <RouterProvider>
+      <Route element={<HomePage />} path="/" />
+      <Route element={<AdminPage />} path="/admin" />
+    </RouterProvider>
   )
 }
 
