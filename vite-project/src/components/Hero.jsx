@@ -46,7 +46,7 @@ function Hero() {
               View Services
             </a>
           </div>
-          <div className="mt-10 grid max-w-xl gap-3 text-sm text-slate-600 sm:grid-cols-3">
+          <div className="absolute hidden sm:grid mt-10 max-w-xl grid-cols-3 gap-3 text-sm text-slate-600">
             {['General practice', 'Preventive health', 'Family care'].map((item) => (
               <div
                 className="rounded-2xl border border-slate-100 bg-white/75 px-4 py-3 shadow-sm shadow-slate-900/5"
@@ -94,7 +94,7 @@ function Hero() {
           </div>
 
           <motion.div
-            className="absolute -bottom-8 right-4 z-20 rounded-3xl bg-teal-700 p-5 text-white shadow-xl shadow-teal-900/20 sm:right-8"
+            className="absolute hidden sm:block md:-bottom-8 lg:-bottom-1 bottom-8 translate-y-1/2 right-4 z-20 rounded-3xl   bg-teal-700 p-5 text-white shadow-xl shadow-teal-900/20 "
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.45, ease: 'easeOut' }}

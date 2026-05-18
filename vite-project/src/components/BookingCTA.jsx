@@ -31,7 +31,7 @@ function BookingCTA() {
             </a>
             <a
               className="rounded-full border border-white/30 px-7 py-4 text-center text-sm font-semibold text-white transition hover:bg-white/10"
-              href="mailto:appointments@example.com"
+              href="mailto:drclassenmedical@gmail.com"
             >
               Email Reception
             </a>
