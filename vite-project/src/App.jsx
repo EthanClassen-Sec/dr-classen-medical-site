@@ -1,5 +1,5 @@
 import About from './components/About'
-import BookingCTA from './components/BookingCTA'
+import AppointmentScheduler from './components/AppointmentScheduler'
 import Footer from './components/Footer'
 import Hero from './components/Hero'
 import Navbar from './components/Navbar'
@@ -12,7 +12,7 @@ function App() {
       <Hero />
       <About />
       <Services />
-      <BookingCTA />
+      <AppointmentScheduler />
       <Footer />
     </main>
   )
