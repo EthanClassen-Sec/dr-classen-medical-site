@@ -94,7 +94,7 @@ function Hero() {
           </div>
 
           <motion.div
-            className="absolute -bottom-5 right-4 z-20 rounded-3xl bg-teal-700 p-5 text-white shadow-xl shadow-teal-900/20 sm:right-8"
+            className="absolute -bottom-8 right-4 z-20 rounded-3xl bg-teal-700 p-5 text-white shadow-xl shadow-teal-900/20 sm:right-8"
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.45, ease: 'easeOut' }}

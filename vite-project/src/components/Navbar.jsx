@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import primaryBrand from '../assets/branding1.jpeg'
+import primaryBrand from '../assets/drclassen_favicon.png'
 
 const navItems = [
   { label: 'About', href: '#about' },
