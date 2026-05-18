@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import primaryBrand from '../assets/branding1.jpeg'
 
 const navItems = [
   { label: 'About', href: '#about' },
@@ -16,8 +17,12 @@ function Navbar() {
     >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 lg:px-8">
         <a href="#top" className="flex items-center gap-3">
-          <span className="grid h-11 w-11 place-items-center rounded-2xl bg-teal-700 text-sm font-semibold text-white shadow-lg shadow-teal-900/10">
-            LC
+          <span className="grid h-12 w-12 overflow-hidden rounded-2xl border border-slate-100 bg-white p-1 shadow-lg shadow-slate-900/8">
+            <img
+              alt="Dr. Lynette Classen practice mark"
+              className="h-full w-full object-contain"
+              src={primaryBrand}
+            />
           </span>
           <span>
             <span className="block text-sm font-semibold tracking-wide text-slate-950">

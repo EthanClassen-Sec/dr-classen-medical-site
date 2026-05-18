@@ -1,4 +1,5 @@
 import { motion } from 'motion/react'
+import primaryBrand from '../assets/branding1.jpeg'
 
 const values = [
   ['Continuity', 'Long-term care plans that keep your medical history, goals, and family context in view.'],
@@ -12,21 +13,30 @@ function About() {
     <section id="about" className="px-6 py-20 lg:px-8">
       <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.85fr_1.15fr]">
         <motion.div
-          className="rounded-[2rem] bg-slate-950 p-8 text-white"
+          className="overflow-hidden rounded-[2rem] bg-slate-950 text-white"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.3 }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-sm font-semibold text-teal-200">
-            About the practice
-          </p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tight">
-            Care that feels considered, calm, and complete.
-          </h2>
-          <p className="mt-5 leading-7 text-slate-300">
-            The practice blends modern clinical standards with warm, relationship-led healthcare, helping patients make confident decisions about their wellbeing.
-          </p>
+          <div className="border-b border-white/10 bg-white p-6">
+            <img
+              alt="Dr. Lynette Classen General Practice logo"
+              className="h-20 w-full object-contain"
+              src={primaryBrand}
+            />
+          </div>
+          <div className="p-8">
+            <p className="text-sm font-semibold text-teal-200">
+              About the practice
+            </p>
+            <h2 className="mt-4 text-4xl font-semibold tracking-tight">
+              Care that feels considered, calm, and complete.
+            </h2>
+            <p className="mt-5 leading-7 text-slate-300">
+              The practice blends modern clinical standards with warm, relationship-led healthcare, helping patients make confident decisions about their wellbeing.
+            </p>
+          </div>
         </motion.div>
 
         <div className="grid gap-5 sm:grid-cols-2">
