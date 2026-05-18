@@ -3,6 +3,7 @@ import { motion } from 'motion/react'
 import { Link } from '../../lib/router'
 import primaryBrand from '../../assets/drclassen_favicon.png'
 
+/** Staff-only sign-in for the clinic dashboard. */
 function AdminLogin({ authError, isLoading, isSupabaseConfigured, onSignIn }) {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -38,11 +39,11 @@ function AdminLogin({ authError, isLoading, isSupabaseConfigured, onSignIn }) {
         </div>
 
         <h1 className="mt-8 text-3xl font-semibold tracking-tight text-slate-950">
-          Sign in to the clinic dashboard
+          Clinic staff sign in
         </h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
-          Secure access for practice staff. Use the admin account created in
-          Supabase Authentication.
+          Secure access for Dr. Classen practice staff. Your account must have a
+          clinic role assigned in the profiles table.
         </p>
 
         {!isSupabaseConfigured && (

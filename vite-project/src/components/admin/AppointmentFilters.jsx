@@ -1,8 +1,11 @@
 import { motion } from 'motion/react'
 
 const FILTERS = [
-  { id: 'upcoming', label: 'Upcoming' },
-  { id: 'today', label: 'Today' },
+  { id: 'pending', label: 'Pending' },
+  { id: 'approved', label: 'Approved' },
+  { id: 'completed', label: 'Completed' },
+  { id: 'declined', label: 'Declined' },
+  { id: 'cancelled', label: 'Cancelled' },
   { id: 'all', label: 'All' },
 ]
 

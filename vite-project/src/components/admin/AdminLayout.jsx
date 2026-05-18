@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
+import { getRoleLabel } from '../../lib/permissions'
 import AdminHeader from './AdminHeader'
 import AdminSidebar from './AdminSidebar'
 
-function AdminLayout({ children, onRefresh, onSignOut, userEmail }) {
+function AdminLayout({ children, onRefresh, onSignOut, userEmail, userRole }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
   return (
@@ -12,6 +13,7 @@ function AdminLayout({ children, onRefresh, onSignOut, userEmail }) {
         <AdminSidebar
           isOpen={isSidebarOpen}
           onClose={() => setIsSidebarOpen(false)}
+          userRole={userRole}
         />
 
         <div className="flex min-w-0 flex-1 flex-col">
@@ -19,6 +21,7 @@ function AdminLayout({ children, onRefresh, onSignOut, userEmail }) {
             onMenuToggle={() => setIsSidebarOpen(true)}
             onRefresh={onRefresh}
             onSignOut={onSignOut}
+            subtitle={userRole ? getRoleLabel(userRole) : ''}
             userEmail={userEmail}
           />
           <motion.main

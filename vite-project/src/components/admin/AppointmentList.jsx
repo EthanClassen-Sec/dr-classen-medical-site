@@ -8,6 +8,8 @@ function AppointmentList({
   isLoading,
   activeFilter,
   actionId,
+  onApprove,
+  onDecline,
   onComplete,
   onCancel,
   onDelete,
@@ -29,8 +31,10 @@ function AppointmentList({
             appointment={appointment}
             index={index}
             key={appointment.id}
+            onApprove={onApprove}
             onCancel={onCancel}
             onComplete={onComplete}
+            onDecline={onDecline}
             onDelete={onDelete}
           />
         ))}
@@ -39,8 +43,10 @@ function AppointmentList({
       <AppointmentTable
         actionId={actionId}
         appointments={appointments}
+        onApprove={onApprove}
         onCancel={onCancel}
         onComplete={onComplete}
+        onDecline={onDecline}
         onDelete={onDelete}
       />
     </>

@@ -6,6 +6,8 @@ import AppointmentStatusBadge from './AppointmentStatusBadge'
 function AppointmentTable({
   appointments,
   actionId,
+  onApprove,
+  onDecline,
   onComplete,
   onCancel,
   onDelete,
@@ -28,6 +30,7 @@ function AppointmentTable({
                 'Time',
                 'Service',
                 'Notes',
+                'Admin notes',
                 'Status',
                 'Actions',
               ].map((heading) => (
@@ -66,18 +69,23 @@ function AppointmentTable({
                 <td className="max-w-[10rem] px-5 py-4 text-slate-700">
                   <p className="line-clamp-2">{appointment.service}</p>
                 </td>
-                <td className="max-w-[12rem] px-5 py-4 text-slate-600">
+                <td className="max-w-[10rem] px-5 py-4 text-slate-600">
                   <p className="line-clamp-2">{appointment.notes}</p>
                 </td>
+                <td className="max-w-[10rem] px-5 py-4 text-slate-600">
+                  <p className="line-clamp-2">{appointment.adminNotes || '—'}</p>
+                </td>
                 <td className="px-5 py-4">
-                  <AppointmentStatusBadge status={appointment.displayStatus} />
+                  <AppointmentStatusBadge status={appointment.status} />
                 </td>
                 <td className="px-5 py-4">
                   <AppointmentActions
                     actionId={actionId}
                     appointment={appointment}
+                    onApprove={onApprove}
                     onCancel={onCancel}
                     onComplete={onComplete}
+                    onDecline={onDecline}
                     onDelete={onDelete}
                   />
                 </td>

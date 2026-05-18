@@ -9,7 +9,7 @@ function DetailRow({ label, value }) {
       <dt className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">
         {label}
       </dt>
-      <dd className="text-sm text-slate-800">{value}</dd>
+      <dd className="text-sm text-slate-800">{value || '—'}</dd>
     </motion.div>
   )
 }
@@ -18,6 +18,8 @@ function AppointmentCard({
   appointment,
   index,
   actionId,
+  onApprove,
+  onDecline,
   onComplete,
   onCancel,
   onDelete,
@@ -30,7 +32,7 @@ function AppointmentCard({
       transition={{ duration: 0.4, delay: index * 0.04 }}
       whileHover={{ y: -2 }}
     >
-      <div className="flex items-start justify-between gap-3">
+      <motion.div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="text-lg font-semibold text-slate-950">
             {appointment.fullName}
@@ -40,22 +42,25 @@ function AppointmentCard({
             {appointment.appointmentTime}
           </p>
         </div>
-        <AppointmentStatusBadge status={appointment.displayStatus} />
-      </div>
+        <AppointmentStatusBadge status={appointment.status} />
+      </motion.div>
 
       <dl className="mt-5 grid gap-4 sm:grid-cols-2">
         <DetailRow label="Email" value={appointment.email} />
         <DetailRow label="Phone" value={appointment.phone} />
         <DetailRow label="Service" value={appointment.service} />
-        <DetailRow label="Notes" value={appointment.notes} />
+        <DetailRow label="Patient notes" value={appointment.notes} />
+        <DetailRow label="Admin notes" value={appointment.adminNotes} />
       </dl>
 
       <div className="mt-5 border-t border-slate-100 pt-4">
         <AppointmentActions
           actionId={actionId}
           appointment={appointment}
+          onApprove={onApprove}
           onCancel={onCancel}
           onComplete={onComplete}
+          onDecline={onDecline}
           onDelete={onDelete}
         />
       </div>

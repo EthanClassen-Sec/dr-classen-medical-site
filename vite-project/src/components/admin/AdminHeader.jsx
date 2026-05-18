@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 
-function AdminHeader({ onMenuToggle, onRefresh, onSignOut, userEmail }) {
+function AdminHeader({ onMenuToggle, onRefresh, onSignOut, userEmail, subtitle }) {
   return (
     <motion.header
       className="sticky top-0 z-30 border-b border-slate-200/80 bg-white/90 px-4 py-4 backdrop-blur-xl sm:px-6 lg:px-8"
@@ -26,7 +26,7 @@ function AdminHeader({ onMenuToggle, onRefresh, onSignOut, userEmail }) {
           </button>
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-              Dashboard
+              {subtitle || 'Clinic dashboard'}
             </p>
             <h1 className="text-xl font-semibold tracking-tight text-slate-950 sm:text-2xl">
               Appointments
@@ -34,7 +34,7 @@ function AdminHeader({ onMenuToggle, onRefresh, onSignOut, userEmail }) {
           </div>
         </div>
 
-        <motion.div className="flex items-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <button
             className="hidden rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50 sm:inline-flex"
             onClick={onRefresh}
@@ -55,7 +55,7 @@ function AdminHeader({ onMenuToggle, onRefresh, onSignOut, userEmail }) {
           >
             Sign out
           </button>
-        </motion.div>
+        </div>
       </div>
     </motion.header>
   )

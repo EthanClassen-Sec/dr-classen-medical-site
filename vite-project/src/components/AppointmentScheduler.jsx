@@ -11,6 +11,7 @@ import {
   getTimeSlots,
   isPastDate,
 } from '../lib/appointmentSlots'
+import { ACTIVE_SLOT_STATUSES } from '../utils/appointmentUtils'
 
 const INITIAL_FORM_DATA = {
   patient_email: '',
@@ -85,7 +86,7 @@ function AppointmentScheduler() {
         .from('appointments')
         .select('appointment_time')
         .eq('appointment_date', dateKey)
-        .eq('status', 'booked')
+        .in('status', ACTIVE_SLOT_STATUSES)
 
       if (!isActive) {
         return
@@ -164,7 +165,7 @@ function AppointmentScheduler() {
       ...formData,
       appointment_date: dateKey,
       appointment_time: selectedSlot,
-      status: 'booked',
+      status: 'pending',
     })
 
     if (error) {
@@ -178,7 +179,7 @@ function AppointmentScheduler() {
       setFormData(INITIAL_FORM_DATA)
       setSelectedSlot('')
       setNotice({
-        message: `Appointment requested for ${formatReadableDate(selectedDate)} at ${selectedSlot}.`,
+        message: `Request submitted for ${formatReadableDate(selectedDate)} at ${selectedSlot}. The practice will confirm once approved.`,
         tone: 'success',
       })
     }
@@ -210,7 +211,7 @@ function AppointmentScheduler() {
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
               {[
                 ['Live availability', 'Supabase keeps the schedule updated as appointments are created.'],
-                ['No double booking', 'A database uniqueness rule should protect each date and time slot.'],
+                ['Pending approval', 'Requests are reviewed by the practice before confirmation.'],
               ].map(([title, text]) => (
                 <div
                   className="rounded-3xl border border-white bg-white p-5 shadow-sm shadow-slate-900/5"

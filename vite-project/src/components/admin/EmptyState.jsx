@@ -2,9 +2,12 @@ import { motion } from 'motion/react'
 
 function EmptyState({ filter }) {
   const messages = {
-    today: 'No appointments scheduled for today.',
-    upcoming: 'No upcoming appointments. New bookings will appear here.',
-    all: 'No appointments yet. Patient bookings will show up in this dashboard.',
+    pending: 'No pending requests. New patient bookings will appear here.',
+    approved: 'No approved appointments in this view.',
+    completed: 'No completed visits yet.',
+    declined: 'No declined requests.',
+    cancelled: 'No cancelled appointments.',
+    all: 'No appointments yet.',
   }
 
   return (
@@ -24,7 +27,7 @@ function EmptyState({ filter }) {
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-slate-950">Nothing scheduled</h3>
+      <h3 className="text-lg font-semibold text-slate-950">Nothing to show</h3>
       <p className="mt-2 max-w-sm text-sm leading-6 text-slate-500">
         {messages[filter] ?? messages.all}
       </p>

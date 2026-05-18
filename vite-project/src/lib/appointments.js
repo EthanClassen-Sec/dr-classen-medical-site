@@ -10,9 +10,6 @@ function requireClient() {
   return { client: supabase, error: null }
 }
 
-/**
- * Fetches all appointments for the admin dashboard (requires authenticated session).
- */
 export async function fetchAllAppointments() {
   const { client, error: configError } = requireClient()
 
@@ -40,8 +37,7 @@ export async function deleteAppointment(id) {
   return { error }
 }
 
-/** Maps UI status actions to database status values. */
-export async function updateAppointmentStatus(id, status) {
+async function patchAppointment(id, fields) {
   const { client, error: configError } = requireClient()
 
   if (configError) {
@@ -50,10 +46,39 @@ export async function updateAppointmentStatus(id, status) {
 
   const { data, error } = await client
     .from(TABLE)
-    .update({ status })
+    .update(fields)
     .eq('id', id)
     .select()
     .single()
 
   return { data, error }
+}
+
+export async function approveAppointment(id, adminNotes = '') {
+  return patchAppointment(id, {
+    status: 'approved',
+    admin_notes: adminNotes || null,
+  })
+}
+
+export async function declineAppointment(id, adminNotes = '') {
+  return patchAppointment(id, {
+    status: 'declined',
+    admin_notes: adminNotes || null,
+  })
+}
+
+export async function cancelAppointment(id, adminNotes = '') {
+  return patchAppointment(id, {
+    status: 'cancelled',
+    admin_notes: adminNotes || null,
+  })
+}
+
+export async function completeAppointment(id, adminNotes = '') {
+  return patchAppointment(id, {
+    status: 'completed',
+    admin_notes: adminNotes || null,
+    completed_at: new Date().toISOString(),
+  })
 }

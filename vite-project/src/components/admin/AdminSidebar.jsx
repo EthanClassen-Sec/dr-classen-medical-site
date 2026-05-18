@@ -1,13 +1,22 @@
-import { motion } from 'motion/react'
-import { Link } from '../../lib/router'
 import primaryBrand from '../../assets/drclassen_favicon.png'
-
-const navItems = [
-  { label: 'Dashboard', href: '/admin', icon: 'grid' },
-  { label: 'Public site', href: '/', icon: 'home', external: false },
-]
+import { useAuth } from '../../context/AuthContext'
+import { getRoleLabel, PERMISSIONS } from '../../lib/permissions'
+import { Link, useRouter } from '../../lib/router'
 
 function NavIcon({ type }) {
+  if (type === 'users') {
+    return (
+      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87M16 7a4 4 0 11-8 0 4 4 0 018 0z"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="1.5"
+        />
+      </svg>
+    )
+  }
+
   if (type === 'home') {
     return (
       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -33,7 +42,18 @@ function NavIcon({ type }) {
   )
 }
 
-function AdminSidebar({ isOpen, onClose }) {
+function AdminSidebar({ isOpen, onClose, userRole }) {
+  const { path } = useRouter()
+  const { hasPermission } = useAuth()
+
+  const navItems = [
+    { label: 'Appointments', href: '/admin', icon: 'grid' },
+    ...(hasPermission(PERMISSIONS.MANAGE_USERS)
+      ? [{ label: 'Users', href: '/admin/users', icon: 'users' }]
+      : []),
+    { label: 'Public site', href: '/', icon: 'home' },
+  ]
+
   return (
     <>
       {isOpen && (
@@ -45,11 +65,10 @@ function AdminSidebar({ isOpen, onClose }) {
         />
       )}
 
-      <motion.aside
+      <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-slate-200/80 bg-white px-5 py-6 shadow-xl shadow-slate-900/5 transition-transform lg:static lg:translate-x-0 lg:shadow-none ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
-        initial={false}
       >
         <div className="flex items-center gap-3 px-2">
           <span className="grid h-11 w-11 overflow-hidden rounded-2xl border border-slate-100 bg-white p-1 shadow-md">
@@ -59,40 +78,56 @@ function AdminSidebar({ isOpen, onClose }) {
               src={primaryBrand}
             />
           </span>
-          <motion.div>
+          <div>
             <p className="text-sm font-semibold text-slate-950">Dr. Classen</p>
-            <p className="text-xs text-slate-500">Admin dashboard</p>
-          </motion.div>
+            <p className="text-xs text-slate-500">Clinic dashboard</p>
+          </div>
         </div>
 
-        <nav className="mt-10 grid gap-1">
-          {navItems.map((item) => (
-            <Link
-              className="flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium text-slate-600 transition hover:bg-slate-50 hover:text-slate-950"
-              key={item.label}
-              onClick={onClose}
-              to={item.href}
-            >
-              <span className="grid h-9 w-9 place-items-center rounded-xl bg-slate-50 text-slate-700">
-                <NavIcon type={item.icon} />
-              </span>
-              {item.label}
-            </Link>
-          ))}
+        {userRole && (
+          <p className="mt-4 rounded-2xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-600">
+            {getRoleLabel(userRole)}
+          </p>
+        )}
+
+        <nav className="mt-8 grid gap-1">
+          {navItems.map((item) => {
+            const isActive = path === item.href
+
+            return (
+              <Link
+                className={`flex items-center gap-3 rounded-2xl px-3 py-3 text-sm font-medium transition ${
+                  isActive
+                    ? 'bg-slate-950 text-white'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-slate-950'
+                }`}
+                key={item.label}
+                onClick={onClose}
+                to={item.href}
+              >
+                <span
+                  className={`grid h-9 w-9 place-items-center rounded-xl ${
+                    isActive ? 'bg-white/10 text-white' : 'bg-slate-50 text-slate-700'
+                  }`}
+                >
+                  <NavIcon type={item.icon} />
+                </span>
+                {item.label}
+              </Link>
+            )
+          })}
         </nav>
 
         <div className="mt-auto rounded-2xl bg-slate-50 p-4">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
-            Practice
+            Workflow
           </p>
-          <p className="mt-2 text-sm font-medium text-slate-800">
-            Family Medical Practice
-          </p>
-          <p className="mt-1 text-xs leading-5 text-slate-500">
-            Manage appointments, statuses, and patient bookings in one place.
+          <p className="mt-2 text-sm leading-5 text-slate-600">
+            Patients submit pending requests. Admins approve or decline before
+            visits are confirmed.
           </p>
         </div>
-      </motion.aside>
+      </aside>
     </>
   )
 }

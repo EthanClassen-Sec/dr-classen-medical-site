@@ -1,16 +1,27 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { fetchAllAppointments } from '../lib/appointments'
+import { PERMISSIONS } from '../lib/permissions'
 import {
-  deleteAppointment,
-  fetchAllAppointments,
-  updateAppointmentStatus,
-} from '../lib/appointments'
+  approveAppointmentRequest,
+  cancelAppointmentRequest,
+  completeAppointmentRequest,
+  declineAppointmentRequest,
+  deleteAppointmentRequest,
+} from '../services/appointmentWorkflow'
+import { useAuth } from '../context/AuthContext'
 import {
   filterAppointments,
   normalizeAppointment,
+  searchAppointments,
   sortAppointmentsByDate,
 } from '../utils/appointmentUtils'
 
-export function useAppointments(activeFilter = 'upcoming', enabled = true) {
+export function useAppointments({
+  activeFilter = 'pending',
+  searchQuery = '',
+  enabled = true,
+} = {}) {
+  const { hasPermission } = useAuth()
   const [appointments, setAppointments] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState('')
@@ -46,48 +57,73 @@ export function useAppointments(activeFilter = 'upcoming', enabled = true) {
     [appointments],
   )
 
-  const filtered = useMemo(
-    () => filterAppointments(sorted, activeFilter),
-    [sorted, activeFilter],
-  )
+  const filtered = useMemo(() => {
+    const byStatus = filterAppointments(sorted, activeFilter)
+    return searchAppointments(byStatus, searchQuery)
+  }, [sorted, activeFilter, searchQuery])
 
-  const runAction = useCallback(async (id, action) => {
-    setActionId(id)
-    setError('')
-
-    let result
-
-    if (action === 'delete') {
-      result = await deleteAppointment(id)
-    } else if (action === 'complete') {
-      result = await updateAppointmentStatus(id, 'completed')
-    } else if (action === 'cancel') {
-      result = await updateAppointmentStatus(id, 'cancelled')
-    }
-
-    if (result?.error) {
-      setError(result.error.message)
-    } else {
-      if (action === 'delete') {
-        setAppointments((current) => current.filter((a) => a.id !== id))
-      } else {
-        const nextStatus = action === 'complete' ? 'completed' : 'cancelled'
-        setAppointments((current) =>
-          current.map((a) =>
-            a.id === id
-              ? {
-                  ...a,
-                  status: nextStatus,
-                  displayStatus: nextStatus,
-                }
-              : a,
-          ),
-        )
-      }
-    }
-
-    setActionId(null)
+  const updateLocalAppointment = useCallback((nextAppointment) => {
+    setAppointments((current) =>
+      current.map((item) =>
+        item.id === nextAppointment.id ? nextAppointment : item,
+      ),
+    )
   }, [])
+
+  const runWorkflow = useCallback(
+    async (id, action, adminNotes = '') => {
+      if (!hasPermission(PERMISSIONS.MANAGE_APPOINTMENTS)) {
+        setError('You do not have permission to manage appointments.')
+        return
+      }
+
+      setActionId(id)
+      setError('')
+
+      let result
+
+      if (action === 'approve') {
+        if (!hasPermission(PERMISSIONS.APPROVE_APPOINTMENTS)) {
+          setError('You do not have permission to approve appointments.')
+          setActionId(null)
+          return
+        }
+
+        result = await approveAppointmentRequest(id, adminNotes)
+      } else if (action === 'decline') {
+        if (!hasPermission(PERMISSIONS.APPROVE_APPOINTMENTS)) {
+          setError('You do not have permission to decline appointments.')
+          setActionId(null)
+          return
+        }
+
+        result = await declineAppointmentRequest(id, adminNotes)
+      } else if (action === 'cancel') {
+        result = await cancelAppointmentRequest(id, adminNotes)
+      } else if (action === 'complete') {
+        result = await completeAppointmentRequest(id, adminNotes)
+      } else if (action === 'delete') {
+        if (!hasPermission(PERMISSIONS.DELETE_APPOINTMENTS)) {
+          setError('You do not have permission to delete appointments.')
+          setActionId(null)
+          return
+        }
+
+        result = await deleteAppointmentRequest(id)
+      }
+
+      if (result?.error) {
+        setError(result.error.message)
+      } else if (action === 'delete') {
+        setAppointments((current) => current.filter((item) => item.id !== id))
+      } else if (result?.data) {
+        updateLocalAppointment(result.data)
+      }
+
+      setActionId(null)
+    },
+    [hasPermission, updateLocalAppointment],
+  )
 
   return {
     appointments: filtered,
@@ -96,8 +132,10 @@ export function useAppointments(activeFilter = 'upcoming', enabled = true) {
     error,
     actionId,
     refresh: loadAppointments,
-    deleteAppointment: (id) => runAction(id, 'delete'),
-    completeAppointment: (id) => runAction(id, 'complete'),
-    cancelAppointment: (id) => runAction(id, 'cancel'),
+    approveAppointment: (id, notes) => runWorkflow(id, 'approve', notes),
+    declineAppointment: (id, notes) => runWorkflow(id, 'decline', notes),
+    cancelAppointment: (id, notes) => runWorkflow(id, 'cancel', notes),
+    completeAppointment: (id, notes) => runWorkflow(id, 'complete', notes),
+    deleteAppointment: (id) => runWorkflow(id, 'delete'),
   }
 }

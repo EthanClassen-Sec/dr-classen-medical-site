@@ -6,18 +6,28 @@ import {
   startOfDay,
 } from 'date-fns'
 
+export const APPOINTMENT_STATUSES = [
+  'pending',
+  'approved',
+  'declined',
+  'completed',
+  'cancelled',
+]
+
+/** Statuses that occupy a calendar slot for patients booking online. */
+export const ACTIVE_SLOT_STATUSES = ['pending', 'approved']
+
 /**
  * Normalizes appointment rows from Supabase.
- * Supports both legacy patient_* columns and full_name / service / notes schemas.
+ * Supports legacy patient_* columns and full_name / service / notes schemas.
  */
 export function normalizeAppointment(row) {
-  const status = row.status ?? 'booked'
-  const displayStatus =
-    status === 'booked' ? 'upcoming' : status === 'completed' ? 'completed' : 'cancelled'
+  const status = row.status ?? 'pending'
 
   return {
     id: row.id,
     createdAt: row.created_at,
+    completedAt: row.completed_at,
     fullName: row.full_name ?? row.patient_name ?? '—',
     email: row.email ?? row.patient_email ?? '—',
     phone: row.phone ?? row.patient_phone ?? '—',
@@ -25,19 +35,18 @@ export function normalizeAppointment(row) {
     appointmentTime: row.appointment_time,
     service: row.service ?? row.reason ?? '—',
     notes: row.notes ?? row.reason ?? '—',
+    adminNotes: row.admin_notes ?? '',
     status,
-    displayStatus,
+    displayStatus: status,
   }
 }
 
-/** Combines date + time into a sortable timestamp. */
 export function getAppointmentDateTime(appointment) {
   const datePart = appointment.appointmentDate ?? ''
   const timePart = appointment.appointmentTime ?? '00:00'
   return parseISO(`${datePart}T${timePart}`)
 }
 
-/** Nearest upcoming appointments first; past dates sink to the bottom. */
 export function sortAppointmentsByDate(appointments) {
   const now = new Date()
 
@@ -60,21 +69,42 @@ export function filterAppointments(appointments, filter) {
     return appointments
   }
 
+  if (filter === 'today') {
+    return appointments.filter((appointment) =>
+      isToday(parseISO(appointment.appointmentDate)),
+    )
+  }
+
+  if (APPOINTMENT_STATUSES.includes(filter)) {
+    return appointments.filter((appointment) => appointment.status === filter)
+  }
+
+  return appointments
+}
+
+export function searchAppointments(appointments, query) {
+  const term = query.trim().toLowerCase()
+
+  if (!term) {
+    return appointments
+  }
+
   return appointments.filter((appointment) => {
-    const date = parseISO(appointment.appointmentDate)
+    const haystack = [
+      appointment.fullName,
+      appointment.email,
+      appointment.phone,
+      appointment.service,
+      appointment.notes,
+      appointment.adminNotes,
+      appointment.appointmentDate,
+      appointment.appointmentTime,
+      appointment.status,
+    ]
+      .join(' ')
+      .toLowerCase()
 
-    if (filter === 'today') {
-      return isToday(date)
-    }
-
-    if (filter === 'upcoming') {
-      return (
-        appointment.displayStatus === 'upcoming' &&
-        (isToday(date) || isFuture(startOfDay(date)))
-      )
-    }
-
-    return true
+    return haystack.includes(term)
   })
 }
 
@@ -83,9 +113,12 @@ export function getAppointmentStats(appointments) {
     isToday(parseISO(a.appointmentDate)),
   ).length
 
+  const pendingCount = appointments.filter((a) => a.status === 'pending').length
+  const approvedCount = appointments.filter((a) => a.status === 'approved').length
+
   const upcomingCount = appointments.filter(
     (a) =>
-      a.displayStatus === 'upcoming' &&
+      ['pending', 'approved'].includes(a.status) &&
       (isToday(parseISO(a.appointmentDate)) ||
         isFuture(startOfDay(parseISO(a.appointmentDate)))),
   ).length
@@ -93,9 +126,12 @@ export function getAppointmentStats(appointments) {
   return {
     total: appointments.length,
     today: todayCount,
+    pending: pendingCount,
+    approved: approvedCount,
     upcoming: upcomingCount,
-    completed: appointments.filter((a) => a.displayStatus === 'completed').length,
-    cancelled: appointments.filter((a) => a.displayStatus === 'cancelled').length,
+    completed: appointments.filter((a) => a.status === 'completed').length,
+    declined: appointments.filter((a) => a.status === 'declined').length,
+    cancelled: appointments.filter((a) => a.status === 'cancelled').length,
   }
 }
 
